@@ -17,7 +17,7 @@ db = SQLAlchemy()
 app = Flask(__name__)
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_DATABASE_URI'] = "mysql+pymysql://sql6691013:9ESmE4iQUN@IP:3306/sql6.freemysqlhosting.net"
+app.config['SQLALCHEMY_DATABASE_URI'] = "mysql+pymysql://Simon030:123456789@IP:3306/localhost"
 
 db.init_app(app)
 
