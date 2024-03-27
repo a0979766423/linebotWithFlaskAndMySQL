@@ -34,6 +34,14 @@ def callback():
     # get request body as text
     body = request.get_data(as_text=True)
     app.logger.info("Request body: " + body)
+    
+    # Check database connection
+    try:
+        db.engine.execute("SELECT 1")
+        app.logger.info("Database connection successful")
+    except Exception as e:
+        app.logger.error("Database connection failed: " + str(e))
+
     # handle webhook body
     try:
         handler.handle(body, signature)
