@@ -44,12 +44,16 @@ def callback():
 # 處理訊息
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
-    sql_cmd = """select test1 from test"""
-    query_data = db.engine.execute(sql_cmd)
-    # print(db.engine.execute(sql_cmd).fetchall())
-    # print('#########   ', query_data.fetchone()[0])
-
-    message = TextSendMessage(text=event.message.text+'   '+query_data.fetchone()[0])
+    input_text = event.message.text
+    # 使用參數化查詢以避免SQL注入攻擊
+    sql_cmd = """SELECT text1 FROM test WHERE text1 = %s"""
+    query_data = db.engine.execute(sql_cmd, (input_text,))
+    # 如果有查詢到資料，則回覆第一條查詢結果；否則回覆預設訊息
+    response = query_data.fetchone()
+    if response:
+        message = TextSendMessage(text=response[0])
+    else:
+        message = TextSendMessage(text="Sorry, I couldn't find a response for that.")
     line_bot_api.reply_message(event.reply_token, message)
 
 import os
