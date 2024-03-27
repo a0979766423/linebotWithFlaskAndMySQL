@@ -37,8 +37,9 @@ def callback():
     
     # Check database connection
     try:
-        db.engine.execute("SELECT 1")
-        app.logger.info("Database connection successful")
+        with db.engine.connect() as connection:
+            result = connection.execute("SELECT 1")
+            app.logger.info("Database connection successful")
     except Exception as e:
         app.logger.error("Database connection failed: " + str(e))
 
@@ -52,13 +53,20 @@ def callback():
 # 處理訊息
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
-    sql_cmd = """select test1 from test"""
-    query_data = db.engine.execute(sql_cmd)
-    # print(db.engine.execute(sql_cmd).fetchall())
-    # print('#########   ', query_data.fetchone()[0])
-
-    message = TextSendMessage(text=event.message.text+'   '+query_data.fetchone()[0])
-    line_bot_api.reply_message(event.reply_token, message)
+    input_text = event.message.text
+    try:
+        with db.engine.connect() as connection:
+            result = connection.execute("SELECT test1 FROM test WHERE column_name = %s", (input_text,))
+            response = result.fetchone()
+            if response:
+                message = TextSendMessage(text=response[0])
+            else:
+                message = TextSendMessage(text="Sorry, I couldn't find a response for that.")
+            line_bot_api.reply_message(event.reply_token, message)
+    except Exception as e:
+        app.logger.error("Database query error: " + str(e))
+        message = TextSendMessage(text="An error occurred while processing your request.")
+        line_bot_api.reply_message(event.reply_token, message)
 
 import os
 if __name__ == "__main__":
