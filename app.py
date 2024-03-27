@@ -45,7 +45,7 @@ def callback():
 @handler.add(MessageEvent, message=TextMessage)
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
-    sql_cmd = """select test from sql6694558"""  # 确保查询字符串格式正确
+    sql_cmd = """select test1 from test"""  # 确保查询字符串格式正确
     try:
         with db.engine.connect() as connection:
             query_data = connection.execute(sql_cmd)
