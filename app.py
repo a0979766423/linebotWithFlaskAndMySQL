@@ -45,12 +45,15 @@ def callback():
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     sql_cmd = """select test1 from test"""
-    query_data = db.engine.execute(sql_cmd)
-    # print(db.engine.execute(sql_cmd).fetchall())
-    # print('#########   ', query_data.fetchone()[0])
-
-    message = TextSendMessage(text=event.message.text+'   '+query_data.fetchone()[0])
-    line_bot_api.reply_message(event.reply_token, message)
+    try:
+        with db.engine.connect() as connection:
+            query_data = connection.execute(sql_cmd)
+            message = TextSendMessage(text=event.message.text+'   '+query_data.fetchone()[0])
+            line_bot_api.reply_message(event.reply_token, message)
+    except Exception as e:
+        app.logger.error("Database query error: " + str(e))
+        message = TextSendMessage(text="An error occurred while processing your request.")
+        line_bot_api.reply_message(event.reply_token, message)
 
 import os
 if __name__ == "__main__":
