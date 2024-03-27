@@ -43,17 +43,23 @@ def callback():
 
 # 處理訊息
 @handler.add(MessageEvent, message=TextMessage)
+@handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
-    sql_cmd = """select test1 from test"""
+    sql_cmd = """select test1 from test"""  # 确保查询字符串格式正确
     try:
         with db.engine.connect() as connection:
             query_data = connection.execute(sql_cmd)
-            message = TextSendMessage(text=event.message.text+'   '+query_data.fetchone()[0])
+            response = query_data.fetchone()
+            if response:
+                message = TextSendMessage(text=event.message.text + '   ' + response[0])
+            else:
+                message = TextSendMessage(text="Sorry, I couldn't find a response for that.")
             line_bot_api.reply_message(event.reply_token, message)
     except Exception as e:
         app.logger.error("Database query error: " + str(e))
         message = TextSendMessage(text="An error occurred while processing your request.")
         line_bot_api.reply_message(event.reply_token, message)
+
 
 import os
 if __name__ == "__main__":
