@@ -55,7 +55,7 @@ def handle_message(event):
         response = query_data.fetchone()
         print("Query result:", response)  # 添加打印語句以查看查詢結果
         if response:
-            message = TextSendMessage(text=event.message.text + '   ' + response[0])
+            message = TextSendMessage(text=event.message.text + '   ' + str(response[0]))
         else:
             message = TextSendMessage(text="Sorry, I couldn't find a response for that.")
         line_bot_api.reply_message(event.reply_token, message)
