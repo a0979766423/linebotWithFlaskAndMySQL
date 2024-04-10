@@ -44,7 +44,7 @@ def callback():
 # 處理訊息
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
-    sql_cmd = """select test1 from test"""  # 确保查询字符串格式正确
+    sql_cmd = """select 年 from 日期"""  # 确保查询字符串格式正确
     try:
         with db.engine.connect() as connection:
             print("Executing query:", sql_cmd)  # 添加打印语句以查看查询语句
