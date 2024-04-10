@@ -10,6 +10,8 @@ from linebot.models import *
 
 from flask_sqlalchemy import SQLAlchemy
 
+from sqlalchemy import text
+
 import random
 import os
 
@@ -41,10 +43,12 @@ def callback():
         abort(400)
     return 'OK'
 
+
+
 # 處理訊息
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
-    sql_cmd = """select Year from Test1"""  # 確保查詢字符串格式正確
+    sql_cmd = text("""select Year from Test1""")  # 使用 text() 函式轉換查詢字符串
     try:
         print("Executing query:", sql_cmd)  # 添加打印語句以查看查詢語句
         query_data = db.session.execute(sql_cmd)
@@ -59,6 +63,7 @@ def handle_message(event):
         app.logger.error("Database query error: " + str(e))
         message = TextSendMessage(text="An error occurred while processing your request.")
         line_bot_api.reply_message(event.reply_token, message)
+
         
 import os
 if __name__ == "__main__":
