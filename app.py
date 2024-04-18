@@ -19,7 +19,7 @@ db = SQLAlchemy()
 app = Flask(__name__)
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_DATABASE_URI'] = "mysql+pymysql://sql6697949:Eueaxg9Spf@sql6.freemysqlhosting.net:3306/sql6697949"
+app.config['SQLALCHEMY_DATABASE_URI'] = "mysql+pymysql://niu01:niuonion2024@127.0.0.1:3306/niu01"
 
 db.init_app(app)
 
@@ -48,7 +48,7 @@ def callback():
 # 處理訊息
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
-    sql_cmd = text("""select Year from Test1""")  # 使用 text() 函式轉換查詢字符串
+    sql_cmd = text("""select number from test""")  # 使用 text() 函式轉換查詢字符串
     try:
         print("Executing query:", sql_cmd)  # 添加打印語句以查看查詢語句
         query_data = db.session.execute(sql_cmd)
