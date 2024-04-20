@@ -19,7 +19,7 @@ db = SQLAlchemy()
 app = Flask(__name__)
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_DATABASE_URI'] = "mysql+pymysql://sql6700120:sql6700120@sql6.freemysqlhosting.net:3306/sql6700120"
+app.config['SQLALCHEMY_DATABASE_URI'] = "mysql+pymysql://sql6700120:RqB7UN23sf@sql6.freemysqlhosting.net:3306/sql6700120"
 
 db.init_app(app)
 
