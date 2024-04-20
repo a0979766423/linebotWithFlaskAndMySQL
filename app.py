@@ -14,28 +14,22 @@ app.config['SQLALCHEMY_DATABASE_URI'] = "mysql+pymysql://sql6700120:RqB7UN23sf@s
 db = SQLAlchemy(app)
 
 # 初始化 Line Bot
-line_bot_api = LineBotApi('Fa3jHjN4J/3n+i59rgcu04nzQ4l0wCz/uK2E/XCXpPuzsmjj0MXILc64ODH/0eDdMsR2gepARx/7TFRL0O3fexOgrkWQp/7M0J2gFTP3IQBFazjPTZQ1uCsNxBv2MvNwVyRjynVbWcH9yRzrIXRl9QdB04t89/1O/w1cDnyilFU=')
-handler = WebhookHandler('1d5a261efe29d5d3099235de25f40a1c')
+line_bot_api = LineBotApi('YOUR_CHANNEL_ACCESS_TOKEN')
+handler = WebhookHandler('YOUR_CHANNEL_SECRET')
 
 # 定義定時任務函式
 def check_database_updates():
     try:
-        # 建立資料庫連接
-        engine = db.get_engine(app)
-        conn = engine.connect()
+        with app.app_context():
+            # 執行查詢
+            sql_cmd = text("""SELECT number FROM test""")
+            result = db.session.execute(sql_cmd)
 
-        # 執行查詢
-        sql_cmd = text("""SELECT number FROM test""")
-        result = conn.execute(sql_cmd)
-
-        # 檢查查詢結果
-        response = result.fetchone()
-        if response:
-            message = TextSendMessage(text=f"Database update detected: {response[0]}")
-            line_bot_api.broadcast(message)  # 向所有使用者發送訊息
-
-        # 關閉資料庫連接
-        conn.close()
+            # 檢查查詢結果
+            response = result.fetchone()
+            if response:
+                message = TextSendMessage(text=f"Database update detected: {response[0]}")
+                line_bot_api.broadcast(message)  # 向所有使用者發送訊息
     except Exception as e:
         print("An error occurred while checking database updates:", str(e))
 
@@ -60,14 +54,16 @@ def callback():
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     try:
-        sql_cmd = text("""SELECT number FROM test""")
-        query_data = db.session.execute(sql_cmd)
-        response = query_data.fetchone()
-        if response:
-            message = TextSendMessage(text=event.message.text + '   ' + str(response[0]))
-        else:
-            message = TextSendMessage(text="Sorry, I couldn't find a response for that.")
-        line_bot_api.reply_message(event.reply_token, message)
+        with app.app_context():
+            # 執行查詢
+            sql_cmd = text("""SELECT number FROM test""")
+            query_data = db.session.execute(sql_cmd)
+            response = query_data.fetchone()
+            if response:
+                message = TextSendMessage(text=event.message.text + '   ' + str(response[0]))
+            else:
+                message = TextSendMessage(text="Sorry, I couldn't find a response for that.")
+            line_bot_api.reply_message(event.reply_token, message)
     except Exception as e:
         print("An error occurred while processing message:", str(e))
         message = TextSendMessage(text="An error occurred while processing your request.")
