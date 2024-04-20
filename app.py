@@ -28,7 +28,7 @@ def check_database_updates():
     try:
         with app.app_context():
             # 執行查詢，按主鍵排序
-            sql_cmd = text("""SELECT id, number FROM test ORDER BY id ASC""")
+            sql_cmd = text("""SELECT 主鍵, number FROM test ORDER BY 主鍵 ASC""")
             result = db.session.execute(sql_cmd)
 
             # 檢查查詢結果
