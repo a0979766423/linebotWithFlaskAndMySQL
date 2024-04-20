@@ -20,14 +20,25 @@ handler = WebhookHandler('1d5a261efe29d5d3099235de25f40a1c')
 # 定義定時任務函式
 def check_database_updates():
     try:
+        # 建立資料庫連接
+        engine = db.get_engine(app)
+        conn = engine.connect()
+
+        # 執行查詢
         sql_cmd = text("""SELECT number FROM test""")
-        query_data = db.session.execute(sql_cmd)
-        response = query_data.fetchone()
+        result = conn.execute(sql_cmd)
+
+        # 檢查查詢結果
+        response = result.fetchone()
         if response:
             message = TextSendMessage(text=f"Database update detected: {response[0]}")
             line_bot_api.broadcast(message)  # 向所有使用者發送訊息
+
+        # 關閉資料庫連接
+        conn.close()
     except Exception as e:
         print("An error occurred while checking database updates:", str(e))
+
 
 # 設定定時任務
 scheduler = BackgroundScheduler()
