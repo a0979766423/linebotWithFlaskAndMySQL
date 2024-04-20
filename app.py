@@ -6,6 +6,7 @@ from linebot.models import TextMessage, TextSendMessage, MessageEvent
 from sqlalchemy import text
 from apscheduler.schedulers.background import BackgroundScheduler
 import os
+from datetime import datetime
 
 # 初始化 Flask 和資料庫
 app = Flask(__name__)
@@ -17,8 +18,12 @@ db = SQLAlchemy(app)
 line_bot_api = LineBotApi('Fa3jHjN4J/3n+i59rgcu04nzQ4l0wCz/uK2E/XCXpPuzsmjj0MXILc64ODH/0eDdMsR2gepARx/7TFRL0O3fexOgrkWQp/7M0J2gFTP3IQBFazjPTZQ1uCsNxBv2MvNwVyRjynVbWcH9yRzrIXRl9QdB04t89/1O/w1cDnyilFU=')
 handler = WebhookHandler('1d5a261efe29d5d3099235de25f40a1c')
 
+# 定義上次發送訊息的時間
+last_message_time = None
+
 # 定義定時任務函式
 def check_database_updates():
+    global last_message_time
     try:
         with app.app_context():
             # 執行查詢
@@ -28,15 +33,18 @@ def check_database_updates():
             # 檢查查詢結果
             response = result.fetchone()
             if response:
-                message = TextSendMessage(text=f"Database update detected: {response[0]}")
-                line_bot_api.broadcast(message)  # 向所有使用者發送訊息
+                # 檢查是否為新的資料更新
+                if last_message_time is None or (datetime.now() - last_message_time).seconds >= 10:  # 每 10 秒鐘發送一次
+                    message = TextSendMessage(text=f"Database update detected: {response[0]}")
+                    line_bot_api.broadcast(message)  # 向所有使用者發送訊息
+                    last_message_time = datetime.now()  # 更新上次發送訊息的時間
     except Exception as e:
         print("An error occurred while checking database updates:", str(e))
 
 
 # 設定定時任務
 scheduler = BackgroundScheduler()
-scheduler.add_job(func=check_database_updates, trigger="interval", minutes=0.5)  # 每 30 分鐘執行一次
+scheduler.add_job(func=check_database_updates, trigger="interval", seconds=10)  # 每 10 秒鐘執行一次
 scheduler.start()
 
 # 處理 Line Bot 的 webhook
