@@ -14,8 +14,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = "mysql+pymysql://sql6700120:RqB7UN23sf@s
 db = SQLAlchemy(app)
 
 # 初始化 Line Bot
-line_bot_api = LineBotApi('YOUR_CHANNEL_ACCESS_TOKEN')
-handler = WebhookHandler('YOUR_CHANNEL_SECRET')
+line_bot_api = LineBotApi('Fa3jHjN4J/3n+i59rgcu04nzQ4l0wCz/uK2E/XCXpPuzsmjj0MXILc64ODH/0eDdMsR2gepARx/7TFRL0O3fexOgrkWQp/7M0J2gFTP3IQBFazjPTZQ1uCsNxBv2MvNwVyRjynVbWcH9yRzrIXRl9QdB04t89/1O/w1cDnyilFU=')
+handler = WebhookHandler('1d5a261efe29d5d3099235de25f40a1c')
 
 # 定義定時任務函式
 def check_database_updates():
