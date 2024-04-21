@@ -21,10 +21,11 @@ handler = WebhookHandler('1d5a261efe29d5d3099235de25f40a1c')
 # 定義上次發送訊息的時間和訊息是否已經發送的標記
 last_message_time = None
 message_sent = False
+first_scan = True  # 標記是否是第一次掃描
 
 # 定義定時任務函式
 def check_database_updates():
-    global last_message_time, message_sent
+    global last_message_time, message_sent, first_scan
     try:
         with app.app_context():
             # 執行查詢，按主鍵排序
@@ -34,8 +35,9 @@ def check_database_updates():
             # 檢查查詢結果
             for row in result:
                 if not message_sent:
-                    if last_message_time is not None and row.主鍵 <= last_message_time:
-                        continue  # 如果資料庫中的資料已經處理過，則忽略
+                    if not first_scan:
+                        if last_message_time is not None and row.主鍵 <= last_message_time:
+                            continue  # 如果資料庫中的資料已經處理過，則忽略
                     message = TextSendMessage(text=f"New database update detected with ID: {row.主鍵}, number: {row.number}")
                     line_bot_api.broadcast(message)  # 向所有使用者發送訊息
                     last_message_time = row.主鍵  # 更新上次發送訊息的時間
@@ -45,18 +47,16 @@ def check_database_updates():
         message_sent = False  # 設置為未發送，以便下一次發送
 
 # 在啟動時將 last_message_time 初始化為資料庫中的最大主鍵值
-@app.before_first_request
-def initialize_last_message_time():
-    global last_message_time
-    try:
-        with app.app_context():
-            # 執行查詢，取得資料庫中的最大主鍵值
-            sql_cmd = text("""SELECT MAX(主鍵) FROM test""")
-            result = db.session.execute(sql_cmd)
-            max_id = result.fetchone()[0]
-            last_message_time = max_id
-    except Exception as e:
-        print("An error occurred while initializing last_message_time:", str(e))
+try:
+    with app.app_context():
+        # 執行查詢，取得資料庫中的最大主鍵值
+        sql_cmd = text("""SELECT MAX(主鍵) FROM test""")
+        result = db.session.execute(sql_cmd)
+        max_id = result.fetchone()[0]
+        last_message_time = max_id
+        first_scan = False  # 將第一次掃描標誌設置為 False
+except Exception as e:
+    print("An error occurred while initializing last_message_time:", str(e))
 
 # 設定定時任務
 scheduler = BackgroundScheduler()
