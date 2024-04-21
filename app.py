@@ -34,7 +34,7 @@ def check_database_updates():
             # 檢查查詢結果
             for row in result:
                 if not message_sent:
-                    message = TextSendMessage(text=f"New database update detected with ID: {row.id}, number: {row.number}")
+                    message = TextSendMessage(text=f"New database update detected with ID: {row.主鍵}, number: {row.number}")
                     line_bot_api.broadcast(message)  # 向所有使用者發送訊息
                     last_message_time = datetime.now()  # 更新上次發送訊息的時間
                     message_sent = True  # 標記訊息已發送
