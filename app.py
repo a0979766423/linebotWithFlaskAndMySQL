@@ -34,14 +34,16 @@ def check_database_updates():
             # 檢查查詢結果
             for row in result:
                 if not message_sent:
+                    if last_message_time is not None and row.主鍵 <= last_message_time:
+                        continue  # 如果資料庫中的資料已經處理過，則忽略
                     message = TextSendMessage(text=f"New database update detected with ID: {row.主鍵}, number: {row.number}")
                     line_bot_api.broadcast(message)  # 向所有使用者發送訊息
-                    last_message_time = datetime.now()  # 更新上次發送訊息的時間
+                    last_message_time = row.主鍵  # 更新上次發送訊息的時間
                     message_sent = True  # 標記訊息已發送
     except Exception as e:
         print("An error occurred while checking database updates:", str(e))
         message_sent = False  # 設置為未發送，以便下一次發送
-
+        
 # 設定定時任務
 scheduler = BackgroundScheduler()
 scheduler.add_job(func=check_database_updates, trigger="interval", seconds=10)  # 每 10 秒鐘執行一次
