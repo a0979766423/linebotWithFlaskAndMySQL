@@ -64,7 +64,7 @@ def handle_message(event):
     try:
         with app.app_context():
             # 執行查詢
-            sql_cmd = text("""SELECT number FROM test ORDER BY id DESC LIMIT 1""")
+            sql_cmd = text("""SELECT number FROM test ORDER BY 主鍵 DESC LIMIT 1""")
             query_data = db.session.execute(sql_cmd)
             response = query_data.fetchone()
             if response:
