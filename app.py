@@ -55,16 +55,20 @@ def check_database_updates():
         message_sent = False  # 設置為未發送，以便下一次發送
 
 # 在啟動時將 last_message_time 初始化為資料庫中的最大主鍵值
-try:
-    with app.app_context():
-        # 執行查詢，取得資料庫中的最大主鍵值
-        sql_cmd = text("""SELECT MAX(主鍵) FROM test""")
-        result = db.session.execute(sql_cmd)
-        max_id = result.fetchone()[0]
-        last_message_time = max_id
-        first_scan = False  # 將第一次掃描標誌設置為 False
-except Exception as e:
-    print("An error occurred while initializing last_message_time:", str(e))
+def initialize_last_message_time():
+    global last_message_time, first_scan
+    try:
+        with app.app_context():
+            # 執行查詢，取得資料庫中的最大主鍵值
+            sql_cmd = text("""SELECT MAX(主鍵) FROM test""")
+            result = db.session.execute(sql_cmd)
+            max_id = result.fetchone()[0]
+            last_message_time = max_id
+            first_scan = False  # 將第一次掃描標誌設置為 False
+    except Exception as e:
+        print("An error occurred while initializing last_message_time:", str(e))
+
+initialize_last_message_time()
 
 # 設定定時任務
 scheduler = BackgroundScheduler()
