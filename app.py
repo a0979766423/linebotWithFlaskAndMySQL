@@ -42,6 +42,14 @@ def check_database_updates():
                     line_bot_api.broadcast(message)  # 向所有使用者發送訊息
                     last_message_time = row.主鍵  # 更新上次發送訊息的時間
                     message_sent = True  # 標記訊息已發送
+                    
+            # 確保更新 last_message_time
+            if not first_scan and last_message_time is not None:
+                sql_max_cmd = text("""SELECT MAX(主鍵) FROM test""")
+                max_id_result = db.session.execute(sql_max_cmd)
+                max_id = max_id_result.fetchone()[0]
+                last_message_time = max_id
+                
     except Exception as e:
         print("An error occurred while checking database updates:", str(e))
         message_sent = False  # 設置為未發送，以便下一次發送
