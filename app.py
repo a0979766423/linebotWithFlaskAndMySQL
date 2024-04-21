@@ -28,6 +28,9 @@ def check_database_updates():
     global last_message_time, message_sent, first_scan
     try:
         with app.app_context():
+            # 重新設置訊息發送標記
+            message_sent = False
+            
             # 執行查詢，按主鍵排序
             sql_cmd = text("""SELECT 主鍵, number FROM test ORDER BY 主鍵 ASC""")
             result = db.session.execute(sql_cmd)
